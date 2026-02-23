@@ -8,12 +8,12 @@ on:
   workflow_dispatch:
     inputs:
       feature_set:
-        description: '功能选择 (默认集成 susfs)'
+        description: '功能选择'
         default: 'susfs'
         required: true
         type: string
       build_bypass:
-        description: '是否跳过签名校验 (Android 16 建议勾选)'
+        description: '跳过签名校验'
         default: true
         required: true
         type: boolean
@@ -25,9 +25,9 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          # 使用 118 稳定版，它是目前 A16 刷机的首选版本
-          - sub_level: "118"
-            os_patch_level: "2025-11"
+          # 切换到 102 版本，这个版本的 fs/open.c 结构与 SUSFS 补丁完美匹配
+          - sub_level: "102"
+            os_patch_level: "2024-12"
     uses: ./.github/workflows/build.yml
     secrets: inherit
     with:
@@ -35,5 +35,5 @@ jobs:
       kernel_version: "6.6"
       sub_level: ${{ matrix.sub_level }}
       os_patch_level: ${{ matrix.os_patch_level }}
-      feature_set: ${{ inputs.feature_set || 'susfs' }}
-      build_bypass: ${{ inputs.build_bypass || true }}
+      feature_set: "susfs"
+      build_bypass: true
