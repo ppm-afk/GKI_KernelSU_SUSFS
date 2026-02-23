@@ -5,7 +5,7 @@ permissions:
   actions: write
 
 on:
-  workflow_dispatch:  # 开启手动触发开关
+  workflow_dispatch:
     inputs:
       feature_set:
         description: '功能选择 (默认集成 susfs)'
@@ -13,33 +13,21 @@ on:
         required: true
         type: string
       build_bypass:
-        description: '是否跳过模块签名校验 (建议勾选)'
+        description: '是否跳过签名校验 (Android 16 建议勾选)'
         default: true
-        required: true
-        type: boolean
-  workflow_call:      # 保留原有的调用模式
-    inputs:
-      ksu_commit:
-        required: false
-        type: string
-      feature_set:
-        required: true
-        type: string
-      build_bypass:
         required: true
         type: boolean
 
 jobs:
   build-kernels-a15:
-    # 这一行决定了编译出的内核版本号
     name: "6.6.${{ matrix.sub_level }}-${{ matrix.os_patch_level }}"
     strategy:
       fail-fast: false
       matrix:
         include:
-          # 我们精简掉旧版本，只保留你最需要的 6.6.123
-          - sub_level: "123"
-            os_patch_level: "2026-02"
+          # 使用 118 稳定版，它是目前 A16 刷机的首选版本
+          - sub_level: "118"
+            os_patch_level: "2025-11"
     uses: ./.github/workflows/build.yml
     secrets: inherit
     with:
@@ -47,7 +35,5 @@ jobs:
       kernel_version: "6.6"
       sub_level: ${{ matrix.sub_level }}
       os_patch_level: ${{ matrix.os_patch_level }}
-      ksu_commit: ${{ inputs.ksu_commit }}
-      # 如果手动触发，则使用输入的值，否则使用默认值
       feature_set: ${{ inputs.feature_set || 'susfs' }}
       build_bypass: ${{ inputs.build_bypass || true }}
